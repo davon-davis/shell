@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
         dir = strsep(&line, " ");
 
         if (dir == NULL) {
-          printf("Could not find the executable file.\n");
-          continue;
+          perror("An error has occurred\n");
+          return -1;
         }
 
         if (chdir(dir) != 0) {

@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
         if (dir == NULL) {
           fprintf(stderr, "An error has occurred\n");
-          return 1;
+          return 0;
         }
 
         if (chdir(dir) != 0) {

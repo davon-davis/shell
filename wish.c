@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         dir = strsep(&line, " ");
 
         if (dir == NULL) {
-          perror("An error has occurred\n");
+          fprintf("An error has occurred\n");
           return -1;
         }
 

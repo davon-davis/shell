@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     fp = fopen(argv[1], "r");
     if (fp == NULL) {
-      perror("fopen");
+      fprintf(stderr, "An error has occurred\n");
       exit(EXIT_FAILURE);
     }
     while ((read = getline(&line, &len, fp)) != -1) {
@@ -45,6 +45,9 @@ int main(int argc, char **argv) {
       cmd = strsep(&s2, " ");
 
       if (strcmp(cmd, "exit") == 0) {
+        if (s2 != NULL && strlen(s2) > 0) {
+          fprintf(stderr, "An error has occurred\n");
+        }
         exit(0);
       } else if (strcmp(cmd, "cd") == 0) {
         // cd only takes one argument
@@ -59,13 +62,9 @@ int main(int argc, char **argv) {
         }
 
         if (chdir(dir) != 0) {
-          printf("Could not change directory.\n");
+          fprintf(stderr, "An error has occurred\n");
+          return 0;
         }
-
-        char s[100];
-
-        // printing current working directory
-        printf("%s\n", getcwd(s, 100));
 
         // printf("cd command has been entered\n");
       } else if (strcmp(cmd, "path") == 0) {
@@ -104,9 +103,9 @@ int main(int argc, char **argv) {
             printf("Invalid path: %s\n", paths[i]);
           }
         }
-        if (valid_paths == 2) {
-          printf("Both paths are valid.\n");
-        }
+//        if (valid_paths == 2) {
+//          printf("Both paths are valid.\n");
+//        }
       } else {
         // Check if the command line contains ampersand characters
         char *ampersand_pos = strchr(line, '&');
@@ -127,6 +126,14 @@ int main(int argc, char **argv) {
           int fd;
           for (int j = 0; j < i; j++) {
             if (strcmp(parmList[j], ">") == 0) {
+              if (j+1 == i) {
+                fprintf(stderr, "An error has occurred\n");
+                return 0;
+              }
+              if (parmList[j+2] != NULL) {  // Throw an error if there is more than one output file
+                fprintf(stderr, "An error has occurred\n");
+                return 0;
+              }
               output_file = parmList[j + 1];
               parmList[j] = NULL;
               break;
@@ -154,7 +161,7 @@ int main(int argc, char **argv) {
             char path[MAX_LEN];
             snprintf(path, sizeof(path), "/bin/%s", parmList[0]);
             if (access(path, F_OK) == -1) {
-              printf("access error\n");
+              fprintf(stderr, "An error has occurred\n");
               exit(EXIT_FAILURE);
             }
             if (execv(path, parmList) < 0) {
@@ -166,7 +173,7 @@ int main(int argc, char **argv) {
           int status;
           waitpid(pid, &status, 0);
           if (status != 0) {
-            printf("The command returned with a non-zero status.\n");
+            return 0;
           }
         } else {
           // The command line contains ampersand characters
@@ -267,6 +274,9 @@ int main(int argc, char **argv) {
       cmd = strsep(&s2, " ");
 
       if (strcmp(cmd, "exit") == 0) {
+        if (s2 != NULL && strlen(s2) > 0) {
+          fprintf(stderr, "An error has occurred\n");
+        }
         exit(0);
       } else if (strcmp(cmd, "cd") == 0) {
         // cd only takes one argument
@@ -276,18 +286,14 @@ int main(int argc, char **argv) {
         dir = strsep(&line, " ");
 
         if (dir == NULL) {
-          printf("Could not find the executable file.\n");
-          continue;
+          fprintf(stderr, "An error has occurred\n");
+          return 0;
         }
 
         if (chdir(dir) != 0) {
-          printf("Could not change directory.\n");
+          fprintf(stderr, "An error has occurred\n");
+          return 0;
         }
-
-        char s[100];
-
-        // printing current working directory
-        printf("%s\n", getcwd(s, 100));
 
         // printf("cd command has been entered\n");
       } else if (strcmp(cmd, "path") == 0) {
@@ -326,9 +332,9 @@ int main(int argc, char **argv) {
             printf("Invalid path: %s\n", paths[i]);
           }
         }
-        if (valid_paths == 2) {
-          printf("Both paths are valid.\n");
-        }
+//        if (valid_paths == 2) {
+//          printf("Both paths are valid.\n");
+//        }
       } else {
         // Check if the command line contains ampersand characters
         char *ampersand_pos = strchr(line, '&');
@@ -349,6 +355,14 @@ int main(int argc, char **argv) {
           int fd;
           for (int j = 0; j < i; j++) {
             if (strcmp(parmList[j], ">") == 0) {
+              if (j+1 == i) {
+                fprintf(stderr, "An error has occurred\n");
+                return 0;
+              }
+              if (parmList[j+2] != NULL) {  // Throw an error if there is more than one output file
+                fprintf(stderr, "An error has occurred\n");
+                return 0;
+              }
               output_file = parmList[j + 1];
               parmList[j] = NULL;
               break;
@@ -376,19 +390,19 @@ int main(int argc, char **argv) {
             char path[MAX_LEN];
             snprintf(path, sizeof(path), "/bin/%s", parmList[0]);
             if (access(path, F_OK) == -1) {
-              printf("access error\n");
-              exit(EXIT_FAILURE);
+              fprintf(stderr, "An error occurred\n");
+              return 0;
             }
             if (execv(path, parmList) < 0) {
               printf("Could not execute command.\n");
-              exit(EXIT_FAILURE);
+              return 0;
             }
           }
 
           int status;
           waitpid(pid, &status, 0);
           if (status != 0) {
-            printf("The command returned with a non-zero status.\n");
+            return 0;
           }
         } else {
           // The command line contains ampersand characters
